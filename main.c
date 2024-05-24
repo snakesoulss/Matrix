@@ -70,7 +70,7 @@ int main() {
     }
   b = gauss(a);
     double X = poind(b, 0, 0);
-    if(X != X) {
+    if(X != X || isnan(X)) {
         printf("no solutions\n");    }
     else {
         for(int j = 0; j < n; j++) {

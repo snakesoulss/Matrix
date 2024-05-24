@@ -6,20 +6,17 @@
 #include "mrtx.h"
 #include "matrix.h"
 
-
 matrix* summa (matrix* a, matrix* b) {
 
-    if (!a || !b) {
-        return NULL;
-    }
+    if (!a) return NULL;
+    if (!b) return NULL;
     size_t m_a = matrix_m(a);
     size_t m_b = matrix_m(b);
     size_t n_a = matrix_n(a);
     size_t n_b = matrix_n(b);
 
-    if(m_a != m_b || n_a != n_b){
-        return NULL;
-    }
+    if(m_a != m_b) return NULL;
+    if (n_a != n_b)return NULL;
 
     for (size_t i = 0; i < m_a; i++) {
         for (size_t j = 0; j < n_a; j++) {
@@ -33,26 +30,18 @@ matrix* summa (matrix* a, matrix* b) {
 }
 
 matrix* matrix_copy(matrix* a, matrix* b) {
-    if (!a) {
-        return NULL;
-    }
+    if (!a) return NULL;
 
     size_t m_a = matrix_m(a);
-    size_t m_b = matrix_m(b);
     size_t n_a = matrix_n(a);
-    size_t n_b = matrix_n(b);
 
     if (!b) {
         b = alloc(m_a, n_a);
     } else {
-        if (m_b != m_a || n_b != n_a) {
             b = matr_alloc(b, m_a, n_a);
-        }
     }
 
-    if (!b) {
-        return NULL;
-    }
+    if (!b) return NULL;
 
     for (size_t i = 0; i < m_a; i++) {
         for (size_t j = 0; j < n_a; j++) {
@@ -68,9 +57,7 @@ matrix* matrix_copy(matrix* a, matrix* b) {
 matrix *sum(matrix *a, matrix *b, matrix *c) {
     c = matrix_copy(a, c);
     c = summa(c, b);
-    if(!c) {
-        return NULL;
-    }
+    if(!c) return NULL;
     return c;
 }
 
@@ -93,9 +80,7 @@ matrix *transportirovanie (matrix *a, matrix *b){        //выполняет транспониро
             b = matr_alloc(b, n_a, m_a);
         }
     }
-    if(!b) {
-        return NULL;
-    }
+    if(!b) return NULL;
     for(size_t i = 0; i < m_a; i++) {
         for(size_t j = 0; j < n_a; j++) {
             element_t x = poind(a, i, j);
@@ -104,17 +89,16 @@ matrix *transportirovanie (matrix *a, matrix *b){        //выполняет транспониро
     }
     return b;
 }
+
 matrix *make_tr_m (matrix *a){         //создает транспонированную матрицу и освобождает память под оригинальную
-    if(!a) {
-        return NULL;
-    }
+    if(!a) return NULL;
+
     size_t m_a = matrix_m(a);
     size_t n_a = matrix_n(a);
     matrix *b = null_alloc(n_a, m_a);
     b = transportirovanie(a, b);
-    if(!b) {
-        return NULL;
-    }
+    if(!b) return NULL;
+
     matrix *c = a;
     a = b;
     matrix_free(c);

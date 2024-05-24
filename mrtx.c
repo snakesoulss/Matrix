@@ -84,3 +84,7 @@ void matrix_free(matrix *a){
     free(a -> mat);
     free(a);
 }
+
+
+
+

@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1715962129 source:d:\stasy\mtrx\main.c
+1716550365 source:d:\stasy\mtrx\main.c
 	<stdio.h>
 	<stdlib.h>
 	"mrtx.h"
@@ -11,7 +11,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1715365138 source:d:\stasy\mtrx\matrix.c
+1716551146 source:d:\stasy\mtrx\matrix.c
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
@@ -20,7 +20,7 @@
 	"mrtx.h"
 	"matrix.h"
 
-1715956383 source:d:\stasy\mtrx\mrtx.c
+1716551152 source:d:\stasy\mtrx\mrtx.c
 	"matrix.h"
 	<malloc.h>
 	<locale.h>
