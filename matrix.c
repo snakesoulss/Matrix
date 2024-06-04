@@ -63,9 +63,12 @@ void e_swap(element_t *a, element_t *b) {
     *b = c;
 }
 
-struct matrix *transportirovanie(struct matrix *a, struct matrix *b) {  // Выполняет транспонирование матрицы
+struct matrix *transportirovanie(struct matrix *a, struct matrix *b) {
+    if (!a) return NULL;
+
     size_t m_a = matrix_m(a);
     size_t n_a = matrix_n(a);
+
     if (!b) {
         b = alloc(n_a, m_a);
     } else {
@@ -74,6 +77,7 @@ struct matrix *transportirovanie(struct matrix *a, struct matrix *b) {  // Выпол
         }
     }
     if (!b) return NULL;
+
     for (size_t i = 0; i < m_a; i++) {
         for (size_t j = 0; j < n_a; j++) {
             element_t x = poind(a, i, j);
@@ -83,22 +87,30 @@ struct matrix *transportirovanie(struct matrix *a, struct matrix *b) {  // Выпол
     return b;
 }
 
-struct matrix *make_tr_m(struct matrix *a) {  // Создает транспонированную матрицу и освобождает память под оригинальную
+struct matrix *make_tr_m(struct matrix *a) {
     if (!a) return NULL;
 
     size_t m_a = matrix_m(a);
     size_t n_a = matrix_n(a);
     struct matrix *b = null_alloc(n_a, m_a);
+    if (!b) {
+        matrix_free(a);
+        return NULL;
+    }
     b = transportirovanie(a, b);
-    if (!b) return NULL;
+    if (!b) {
+        matrix_free(a);
+        return NULL;
+    }
 
-    struct matrix *c = a;
-    a = b;
-    matrix_free(c);
-    return a;
+    matrix_free(a);
+    return b;
 }
 
-struct matrix *matrix_multiplie(struct matrix *a, struct matrix *b, struct matrix *c) {  // Умножает две матрицы
+
+struct matrix *matrix_multiplie(struct matrix *a, struct matrix *b, struct matrix *c) {
+    if (!a || !b) return NULL;
+
     size_t m_a = matrix_m(a);
     size_t m_b = matrix_m(b);
     size_t n_a = matrix_n(a);
@@ -128,7 +140,7 @@ struct matrix *matrix_multiplie(struct matrix *a, struct matrix *b, struct matri
     return c;
 }
 
-element_t m_norm(struct matrix *a) {  // Вычисляет норму матрицы
+element_t m_norm(struct matrix *a) {
     size_t m_a = matrix_m(a);
     size_t n_a = matrix_n(a);
     element_t norm = 0;
@@ -144,7 +156,7 @@ element_t m_norm(struct matrix *a) {  // Вычисляет норму матрицы
     return norm;
 }
 
-struct matrix *mult_mtrx_on_number(struct matrix *a, element_t b) {  // Умножает матрицу на число
+struct matrix *mult_mtrx_on_number(struct matrix *a, element_t b) {
     if (!a) {
         return NULL;
     }
@@ -172,10 +184,20 @@ struct matrix *m_exp(struct matrix *a, element_t eps) {
         return NULL;
     }
     struct matrix *deg = ed_d_alloc(m_a, na);
+    if (!deg) return NULL;
     struct matrix *cur = null_alloc(m_a, na);
+    if (!cur) {
+        matrix_free(deg);
+        return NULL;
+    }
     double N = 1;
     while (m_norm(deg) >= eps) {
         struct matrix *x = null_alloc(m_a, na);
+        if (!x) {
+            matrix_free(deg);
+            matrix_free(cur);
+            return NULL;
+        }
         cur = summa(cur, deg);
         x = matrix_multiplie(deg, a, x);
         x = mult_mtrx_on_number(x, 1 / N);
@@ -189,9 +211,10 @@ struct matrix *m_exp(struct matrix *a, element_t eps) {
     return cur;
 }
 
-void replacement(struct matrix *a, size_t x, size_t y) {  // Замена строк
+void replacement(struct matrix *a, size_t x, size_t y) {
     size_t na = matrix_n(a);
     element_t *b = malloc(na * sizeof(element_t));
+    if (!b) return;
     for (size_t j = 0; j < na; j++) {
         b[j] = poind(a, x, j);
     }
@@ -205,7 +228,7 @@ void replacement(struct matrix *a, size_t x, size_t y) {  // Замена строк
     free(b);
 }
 
-void subsrt(struct matrix *a, size_t x, size_t y, element_t c) {  // Вычитание строк
+void subsrt(struct matrix *a, size_t x, size_t y, element_t c) {
     size_t na = matrix_n(a);
     for (size_t j = 0; j < na; j++) {
         element_t k = poind(a, x, j);
@@ -214,7 +237,7 @@ void subsrt(struct matrix *a, size_t x, size_t y, element_t c) {  // Вычитание с
     }
 }
 
-void str_mult(struct matrix *a, size_t x, element_t c) {  // Умножение строки на число
+void str_mult(struct matrix *a, size_t x, element_t c) {
     size_t na = matrix_n(a);
     for (size_t j = 0; j < na; j++) {
         element_t k = poind(a, x, j);
@@ -222,10 +245,14 @@ void str_mult(struct matrix *a, size_t x, element_t c) {  // Умножение строки на
     }
 }
 
-struct matrix *gauss(struct matrix *a) {  // Выполняет метод Гаусса
+struct matrix *gauss(struct matrix *a) {
+    if (!a) return NULL;
+
     size_t m_a = matrix_m(a);
     size_t na = matrix_n(a);
     struct matrix *b = alloc(m_a, 1);
+    if (!b) return NULL;
+
     for (size_t i = 0; i < m_a; i++) {
         if (poind(a, i, i) == 0.0) {
             for (size_t j = i; j < m_a; j++) {
@@ -252,11 +279,12 @@ struct matrix *gauss(struct matrix *a) {  // Выполняет метод Гаусса
     for (size_t j = m_a; j > 0; j--) {
         size_t i = j - 1;
         element_t x = poind(a, i, na - 1);
-        for (size_t j = m_a - 1; j > i; j--) {
-            x -= poind(b, j, 0) * poind(a, i, j);
+        for (size_t k = m_a - 1; k > i; k--) {
+            x -= poind(b, k, 0) * poind(a, i, k);
         }
         element_t u = poind(a, i, i);
         change(b, i, 0, x / u);
     }
     return b;
 }
+
